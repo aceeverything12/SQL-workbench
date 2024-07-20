@@ -1,0 +1,132 @@
+-- Create the database
+CREATE DATABASE SmalltownClinic;
+USE SmalltownClinic;
+
+-- Create the EmployeeType table
+CREATE TABLE EmployeeType (
+    TypeID INT AUTO_INCREMENT PRIMARY KEY,
+    Description VARCHAR(255) NOT NULL
+);
+
+-- Create the Employee table
+CREATE TABLE Employee (
+    EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
+    Password VARCHAR(255) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    FirstName VARCHAR(100) NOT NULL,
+    TypeID INT NOT NULL,
+    Gender VARCHAR(10) NOT NULL,
+    DateOfHire DATE NOT NULL,
+    FOREIGN KEY (TypeID) REFERENCES EmployeeType(TypeID)
+);
+
+-- Create the Specialty table
+CREATE TABLE Specialty (
+    SpecialtyID INT AUTO_INCREMENT PRIMARY KEY,
+    Description VARCHAR(255) NOT NULL
+);
+
+-- Create the EmployeeSpecialty table
+CREATE TABLE EmployeeSpecialty (
+    EmployeeID INT NOT NULL,
+    SpecialtyID INT NOT NULL,
+    PRIMARY KEY (EmployeeID, SpecialtyID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (SpecialtyID) REFERENCES Specialty(SpecialtyID)
+);
+
+-- Create the Schedule table
+CREATE TABLE Schedule (
+    EmployeeID INT NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    DayOfWeek VARCHAR(15) NOT NULL,
+    PRIMARY KEY (EmployeeID, DayOfWeek),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID)
+);
+
+-- Create the Patients table
+CREATE TABLE Patients (
+    PatientID INT AUTO_INCREMENT PRIMARY KEY,
+    Password VARCHAR(255) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    FirstName VARCHAR(100) NOT NULL,
+    Street VARCHAR(255) NOT NULL,
+    City VARCHAR(100) NOT NULL,
+    State VARCHAR(50) NOT NULL,
+    Zip VARCHAR(20) NOT NULL,
+    Gender VARCHAR(10) NOT NULL
+);
+
+-- Create the MedicalConditions table
+CREATE TABLE MedicalConditions (
+    ConditionID INT AUTO_INCREMENT PRIMARY KEY,
+    Description VARCHAR(255) NOT NULL
+);
+
+-- Create the MedicalHistoryCondition table
+CREATE TABLE MedicalHistoryCondition (
+    PatientID INT NOT NULL,
+    Date DATE NOT NULL,
+    ConditionID INT NOT NULL,
+    PRIMARY KEY (PatientID, Date, ConditionID),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (ConditionID) REFERENCES MedicalConditions(ConditionID)
+);
+
+-- Create the Surgery table
+CREATE TABLE Surgery (
+    SurgeryID INT AUTO_INCREMENT PRIMARY KEY,
+    Description VARCHAR(255) NOT NULL
+);
+
+-- Create the MedicalHistorySurgery table
+CREATE TABLE MedicalHistorySurgery (
+    PatientID INT NOT NULL,
+    Date DATE NOT NULL,
+    SurgeryID INT NOT NULL,
+    PRIMARY KEY (PatientID, Date, SurgeryID),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (SurgeryID) REFERENCES Surgery(SurgeryID)
+);
+
+-- Create the Prescription table
+CREATE TABLE Prescription (
+    PrescriptionID INT AUTO_INCREMENT PRIMARY KEY,
+    Description VARCHAR(255) NOT NULL
+);
+
+-- Create the MedicalHistoryPrescription table
+CREATE TABLE MedicalHistoryPrescription (
+    PatientID INT NOT NULL,
+    Date DATE NOT NULL,
+    ConditionID INT NOT NULL,
+    PrescriptionID INT NOT NULL,
+    PRIMARY KEY (PatientID, Date, ConditionID, PrescriptionID),
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (ConditionID) REFERENCES MedicalConditions(ConditionID),
+    FOREIGN KEY (PrescriptionID) REFERENCES Prescription(PrescriptionID)
+);
+
+-- Create the Appointment table
+CREATE TABLE Appointment (
+    AppointmentID INT AUTO_INCREMENT PRIMARY KEY,
+    PatientID INT NOT NULL,
+    EmployeeID INT NOT NULL,
+    Date DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    Duration TIME NOT NULL,
+    Status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (PatientID) REFERENCES Patients(PatientID),
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID)
+);
+
+-- Create the Diagnosis table
+CREATE TABLE Diagnosis (
+    AppointmentID INT NOT NULL,
+    Diagnosis VARCHAR(255) NOT NULL,
+    PrescriptionID INT,
+    PRIMARY KEY (AppointmentID),
+    FOREIGN KEY (AppointmentID) REFERENCES Appointment(AppointmentID),
+    FOREIGN KEY (PrescriptionID) REFERENCES Prescription(PrescriptionID)
+);
